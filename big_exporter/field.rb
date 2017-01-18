@@ -1,3 +1,5 @@
+require 'bidu/core_ext'
+
 class BigExporter
   class Field
     attr_reader :name, :value, :repeat
@@ -12,11 +14,20 @@ class BigExporter
       {
         name: name,
         type: type,
-        mode: mode
-      }
+        mode: mode,
+        fields: fields
+      }.compact
     end
 
     private
+
+    def fields
+      is_record? ? build_fields : nil
+    end
+
+    def build_fields
+      Structure.new(value).as_json
+    end
 
     def mode
       @mode ||= repeat ? 'REPEATED' : 'NULLABLE'
@@ -31,7 +42,7 @@ class BigExporter
     end
 
     def fetch_type
-      return %w(string integer float boolean).find do |t|
+      return %w(string integer float boolean record).find do |t|
         send("is_#{t}?")
       end || 'string'
     end
@@ -46,6 +57,10 @@ class BigExporter
 
     def is_float?
       value.is_a?(Float)
+    end
+
+    def is_record?
+      value.is_a?(Hash)
     end
 
     def is_boolean?
