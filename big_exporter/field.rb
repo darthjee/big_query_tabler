@@ -42,9 +42,13 @@ class BigExporter
     end
 
     def fetch_type
-      return %w(string integer float boolean record).find do |t|
+      return %w(string timestamp integer float boolean record).find do |t|
         send("is_#{t}?")
       end || 'string'
+    end
+
+    def is_timestamp?
+      is_integer? && value > 1400000000000 && name.match(/date/i)
     end
 
     def is_integer?
