@@ -44,7 +44,7 @@ class BigExporter
     def fetch_type
       return %w(string timestamp integer float boolean record).find do |t|
         send("is_#{t}?")
-      end || 'string'
+      end || 'NOTFOUND'
     end
 
     def is_timestamp?
